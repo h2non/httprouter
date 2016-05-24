@@ -242,9 +242,11 @@ func (r *Router) Handler(method, path string, handler http.Handler) {
 	r.Handle(method, path,
 		func(w http.ResponseWriter, req *http.Request, ps Params) {
 			// Expose path params via URL query
+			query := req.URL.Query()
 			for _, param := range ps {
-				req.URL.Query().Set(":"+param.Key, param.Value)
+				query.Set(":"+param.Key, param.Value)
 			}
+			req.URL.RawQuery = query.Encode()
 			handler.ServeHTTP(w, req)
 		},
 	)
