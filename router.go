@@ -240,7 +240,11 @@ func (r *Router) Handle(method, path string, handle Handle) {
 // request handle.
 func (r *Router) Handler(method, path string, handler http.Handler) {
 	r.Handle(method, path,
-		func(w http.ResponseWriter, req *http.Request, _ Params) {
+		func(w http.ResponseWriter, req *http.Request, ps Params) {
+			// Expose path params via URL query
+			for _, param := range ps {
+				req.URL.Query().Set(":"+param.Key, param.Value)
+			}
 			handler.ServeHTTP(w, req)
 		},
 	)
